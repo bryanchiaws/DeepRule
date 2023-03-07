@@ -3,8 +3,8 @@ import torch
 import importlib
 import torch.nn as nn
 
-from config import system_configs
-from models.py_utils.data_parallel import DataParallel
+from ..config import system_configs
+from ..models.py_utils.data_parallel import DataParallel
 
 torch.manual_seed(317)
 
@@ -34,7 +34,7 @@ class NetworkFactory(object):
     def __init__(self, db):
         super(NetworkFactory, self).__init__()
 
-        module_file = "models.{}".format(system_configs.snapshot_name)
+        module_file = "DeepRule.models.{}".format(system_configs.snapshot_name)
         print("module_file: {}".format(module_file))
         nnet_module = importlib.import_module(module_file)
 

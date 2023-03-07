@@ -1,7 +1,7 @@
-from db.coco import Chart
-from db.coco import MSCOCO
-from db.coco import SKU
-from db.coco import Pie, Line, Bar, Cls, LineCls, LineClsReal
+from DeepRule.db.coco import Chart
+from DeepRule.db.coco import MSCOCO
+from DeepRule.db.coco import SKU
+from DeepRule.db.coco import Pie, Line, Bar, Cls, LineCls, LineClsReal
 datasets = {
     "Chart": Chart,
     "MSCOCO": MSCOCO,

@@ -26,10 +26,10 @@ class Config:
         self._configs["chunk_sizes"]       = None
 
         # Directories
-        self._configs["data_dir"]   = "./data"
+        self._configs["data_dir"]   = "./DeepRule/data"
         self._configs["cache_dir"]  = self._configs["data_dir"] + "/cache/"
-        self._configs["config_dir"] = "./config"
-        self._configs["result_dir"] = "./results"
+        self._configs["config_dir"] = "./DeepRule/config"
+        self._configs["result_dir"] = "./output"
         self._configs["tar_data_dir"] = 'cls'
 
         # Split
