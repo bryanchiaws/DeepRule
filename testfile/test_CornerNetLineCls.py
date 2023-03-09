@@ -5,9 +5,9 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from config import system_configs
+from DeepRule.config import system_configs
 import math
-import external.nms as nms
+import DeepRule.external.nms as nms
 
 def _rescale_points(dets, ratios, borders, sizes):
     xs, ys = dets[:, :, 0], dets[:, :, 1]

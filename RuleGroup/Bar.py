@@ -92,7 +92,7 @@ def scale_adjust(data, x_min, x_max, y_min, y_max):
 
 
 def cal_dis(a, b):
-    return -(a['bbox'][0]-b['bbox'][0]+0.1*(a['bbox'][1]-b['bbox'][1]))
+    return -(1*(a['bbox'][0]-b['bbox'][0])+0.1*(a['bbox'][1]-b['bbox'][1]))
 
 
 def estimate_zero_line(br_keys):
@@ -282,4 +282,4 @@ def GroupBarRaw(image, tls_raw, brs_raw):
             #zero_y = estimate_zero_line(brs)
             groups = group_point(tl_same, br_same)
             draw_group(groups, image)
-    return groups
+    return image, groups

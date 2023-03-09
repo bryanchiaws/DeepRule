@@ -3,8 +3,8 @@ import torch
 import importlib
 import torch.nn as nn
 
-from ..config import system_configs
-from ..models.py_utils.data_parallel import DataParallel
+from DeepRule.config import system_configs
+from DeepRule.models.py_utils.data_parallel import DataParallel
 
 torch.manual_seed(317)
 
@@ -64,8 +64,8 @@ class NetworkFactory(object):
             raise ValueError("unknown optimizer")
 
     def cuda(self, cuda_id=0):
-        self.model.cuda(cuda_id)
-        self.network.cuda(cuda_id)
+        self.model.cuda("cuda:%s" % cuda_id )
+        self.network.cuda("cuda:%s" % cuda_id)
         self.cuda_id = cuda_id
 
     def train_mode(self):

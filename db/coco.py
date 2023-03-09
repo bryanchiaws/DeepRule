@@ -7,9 +7,9 @@ import pickle
 import copy
 from tqdm import tqdm
 from .detection import DETECTION
-from ..config import system_configs
-from ..pycocotool.coco import COCO
-from ..pycocotool.cocoeval import COCOeval
+from DeepRule.config import system_configs
+from DeepRule.pycocotool.coco import COCO
+from DeepRule.pycocotool.cocoeval import COCOeval
 
 
 class MSCOCO(DETECTION):

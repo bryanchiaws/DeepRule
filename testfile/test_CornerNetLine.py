@@ -5,9 +5,9 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from config import system_configs
-from utils import crop_image, normalize_
-import external.nms as nms
+from DeepRule.config import system_configs
+from DeepRule.utils import crop_image, normalize_
+import CornerNet.external.nms as nms
 
 def _rescale_points(dets, ratios, borders, sizes):
     xs, ys = dets[:, :, 3], dets[:, :, 4]

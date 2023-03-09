@@ -29,6 +29,7 @@ def make_dirs(directories):
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)
+            
 def load_net(testiter, cfg_name, data_dir, cache_dir, cuda_id=0):
     cfg_file = os.path.join(system_configs.config_dir, cfg_name + ".json")
     with open(cfg_file, "r") as f:

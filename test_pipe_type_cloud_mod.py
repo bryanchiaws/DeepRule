@@ -23,10 +23,12 @@ from DeepRule.RuleGroup.LIneMatch import GroupLineRaw
 from DeepRule.RuleGroup.Pie import GroupPie
 import math
 from PIL import Image, ImageDraw, ImageFont
+import imutils
 torch.backends.cudnn.benchmark = False
 import requests
 import time
 import re
+import pdb
 
 def make_dirs(directories):
     for directory in directories:
@@ -40,7 +42,7 @@ def load_net(testiter, cfg_name, data_dir, cache_dir, cuda_id=0):
     configs["system"]["data_dir"] = data_dir
     configs["system"]["cache_dir"] = cache_dir
     configs["system"]["result_dir"] = 'result_dir'
-    configs["system"]["tar_data_dir"] = "Cls"
+    configs["system"]["tar_data_dir"] = "cls"
     system_configs.update_config(configs["system"])
 
     train_split = system_configs.train_split
@@ -52,7 +54,6 @@ def load_net(testiter, cfg_name, data_dir, cache_dir, cuda_id=0):
         "validation": val_split,
         "testing": test_split
     }["validation"]
-
 
     test_iter = system_configs.max_iter if testiter is None else testiter
     print("loading parameters at iteration: {}".format(test_iter))
@@ -69,6 +70,12 @@ def load_net(testiter, cfg_name, data_dir, cache_dir, cuda_id=0):
 
 def Pre_load_nets(type, id_cuda, data_dir, cache_dir):
     methods = {}
+    db_cls, nnet_cls = load_net(50000, "CornerNetCls", "DeepRule/data/clsdata(1031)", "DeepRule/data/clsdata(1031)/cache",
+                                id_cuda)
+    path = 'DeepRule.testfile.test_%s' % "CornerNetCls"
+    testing_cls = importlib.import_module(path).testing
+    methods['Cls'] = [db_cls, nnet_cls, testing_cls]                    
+
     if type == "Bar":
         db_bar, nnet_bar = load_net(50000, "CornerNetPureBar", data_dir, cache_dir,
                                     id_cuda)
@@ -196,32 +203,40 @@ class DeepRule():
     def __init__(self, types = "Bar", data_dir = "DeepRule/data/bardata(1031)", cache_path = "DeepRule/data/bardata(1031)/cache"):
 
         self.methods = Pre_load_nets(types, 0, data_dir, cache_path)
+        return
 
-    def test(image_path, data_type=0, debug=False, suffix=None, min_value_official=None, max_value_official=None):
+    def test(self, image_path, data_type=0, debug=False, suffix=None, min_value_official=None, max_value_official=None):
         image = Image.open(image_path)
         image_cls = cv2.imread(image_path)
+
+        if "16.png" in image_path:
+            #image = Image.Image.rotate(image, 90, expand = 1)
+            image_cls = imutils.rotate_bound(image_cls, -90)
+            color_converted = cv2.cvtColor(image_cls, cv2.COLOR_BGR2RGB)
+            image=Image.fromarray(color_converted)
+
         with torch.no_grad():
-            results = self.methods['Cls'][2](image, self.methods['Cls'][0], self.methods['Cls'][1], debug=False)
+            results = self.methods['Cls'][2](image_cls, self.methods['Cls'][0], self.methods['Cls'][1], debug=False)
             info = results[0]
             tls = results[1]
             brs = results[2]
             plot_area = []
-            image_painted, cls_info = GroupCls(image_cls, tls, brs)
-            title2string, min_value, max_value = try_math(image_path, cls_info)
+            image, cls_info = GroupCls(image, tls, brs)
+            #title2string, min_value, max_value = try_math(image_path, cls_info)
             if data_type == 0:
                 print("Predicted as BarChart")
                 results = self.methods['Bar'][2](image_cls, self.methods['Bar'][0], self.methods['Bar'][1], debug=False)
                 tls = results[0]
                 brs = results[1]
-                bar_data = GroupBarRaw(image, tls, brs)
-                return bar_data
+                image, bar_data = GroupBarRaw(image, tls, brs)
+                return image, bar_data, cls_info
             if data_type == 2:
                 print("Predicted as PieChart")
                 results = self.methods['Pie'][2](image, self.methods['Pie'][0], self.methods['Pie'][1], debug=False)
                 cens = results[0]
                 keys = results[1]
                 pie_data = GroupPie(image, cens, keys)
-                return pie_data
+                return image, bar_data, cls_info
 
             if data_type== 1:
                 print("Predicted as LineChart")
@@ -231,7 +246,7 @@ class DeepRule():
                 image_painted, quiry, keys, hybrids = GroupQuiryRaw(image, keys, hybrids)
                 results = self.methods['LineCls'][2](image, self.methods['LineCls'][0], quiry, self.methods['LineCls'][1], debug=False, cuda_id=1)
                 line_data = GroupLineRaw(image_painted, keys, hybrids, results)
-                return line_data
+                return image, bar_data, cls_info
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Test DeepRule")
